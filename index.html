@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบทดสอบภาษาไทย สกร. อำเภอโนนสัง</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #B71C1C; --primary-dark: #7F0000; --primary-light: #FFEBEE;
+    --green: #3B6D11; --green-light: #EAF3DE; --green-mid: #97C459;
+    --red: #A32D2D; --red-light: #FCEBEB; --red-mid: #F09595;
+    --amber-light: #FAEEDA; --amber: #633806;
+    --gray-bg: #f5f4f0; --gray-card: #fff; --gray-border: #e0e0e0;
+    --text: #1a1a1a; --text-muted: #666;
+  }
+  body { font-family: 'Sarabun', sans-serif; background: var(--gray-bg); color: var(--text); padding-bottom: 40px; }
+  .container { max-width: 680px; margin: 0 auto; padding: 16px; }
+  .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 16px; padding: 24px; color: #fff; margin-bottom: 16px; position: relative; overflow: hidden; }
+  .header::before { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,0.07); }
+  .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+  .title { font-size: 22px; font-weight: 700; margin-bottom: 5px; line-height: 1.4; }
+  .subtitle { font-size: 14px; opacity: 0.9; }
+  .card { background: var(--gray-card); border-radius: 16px; padding: 24px; border: 1px solid var(--gray-border); margin-bottom: 16px; }
+  .inp-group { margin-bottom: 16px; text-align: left; }
+  .inp-label { display: block; font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+  .inp-text { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--gray-border); font-family: 'Sarabun', sans-serif; font-size: 16px; background: #fafafa; }
+  .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-family: 'Sarabun', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary { background: #e0e0e0; color: var(--text); width: 48%; }
+  .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+  .nav-buttons .btn-primary { width: 48%; }
+  .prog-text { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .prog-bar { background: #eee; height: 10px; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .prog-fill { background: var(--primary); height: 100%; width: 0%; transition: 0.3s; }
+  .q-badge { font-size: 12px; color: var(--primary); font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .q-num-circle { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--primary-light); color: var(--primary-dark); font-size: 13px; font-weight: 700; margin-right: 8px; vertical-align: middle; flex-shrink: 0; }
+  .q-text { font-size: 17px; font-weight: 600; margin-bottom: 16px; line-height: 1.75; display: flex; align-items: flex-start; gap: 4px; }
+  .q-passage { background: #FFF8F8; border-left: 4px solid var(--primary); border-radius: 0 10px 10px 0; padding: 14px 16px; font-size: 15px; line-height: 2; color: #333; margin-bottom: 16px; font-style: normal; }
+  .choice { display: flex; align-items: center; background: #fff; border: 2px solid var(--gray-border); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-size: 15px; font-family: 'Sarabun', sans-serif; text-align: left; transition: 0.2s; width: 100%; }
+  .choice:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-light); }
+  .choice.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+  .choice.correct { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 600; }
+  .choice.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); font-weight: 600; }
+  .choice:disabled { cursor: not-allowed; }
+  .c-let { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%; margin-right: 12px; font-weight: 700; font-size: 13px; flex-shrink: 0; transition: 0.2s; }
+  .choice.selected .c-let { background: var(--primary); color: #fff; }
+  .choice.correct .c-let { background: var(--green); color: #fff; }
+  .choice.wrong .c-let { background: var(--red); color: #fff; }
+  .feedback { padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.7; margin-top: 16px; }
+  .feedback.ok { background: var(--green-light); border: 1px solid var(--green-mid); color: #1f3a09; }
+  .feedback.no { background: var(--red-light); border: 1px solid var(--red-mid); color: #521717; }
+  .fb-explain { display: block; margin-top: 6px; font-size: 13px; opacity: 0.85; }
+  .dot-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; justify-content: center; }
+  .dot { width: 32px; height: 32px; border-radius: 8px; border: none; font-family: 'Sarabun', sans-serif; font-weight: 600; font-size: 12px; cursor: pointer; background: #e0e0e0; color: var(--text); transition: 0.15s; }
+  .dot.active { background: var(--primary); color: #fff; transform: scale(1.1); }
+  .dot.ok { background: var(--green); color: #fff; }
+  .dot.no { background: var(--red); color: #fff; }
+  .cert-header { font-size: 16px; font-weight: 700; color: var(--primary-dark); margin-bottom: 6px; }
+  .cert-name { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .cert-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+  .score-big { font-size: 56px; font-weight: 700; color: var(--primary); line-height: 1; }
+  .score-denom { font-size: 20px; color: var(--text-muted); margin-bottom: 8px; }
+  .grade-pill { display: inline-block; padding: 5px 20px; border-radius: 99px; font-size: 14px; font-weight: 700; }
+  .grade-A { background: var(--green-light); color: var(--green); }
+  .grade-B { background: var(--primary-light); color: var(--primary-dark); }
+  .grade-C { background: var(--amber-light); color: var(--amber); }
+  .grade-D { background: var(--red-light); color: var(--red); }
+  .feedback-box { background: var(--primary-light); border: 1px solid #EF9A9A; border-radius: 12px; padding: 14px 16px; font-size: 14px; line-height: 1.7; color: var(--primary-dark); margin-bottom: 20px; text-align: left; }
+  .grid-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+  .stat-box { background: #f9f9f9; padding: 16px 10px; border-radius: 12px; text-align: center; border: 1px solid var(--gray-border); }
+  .stat-num { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .slbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .review-title { font-size: 17px; font-weight: 700; padding-bottom: 12px; border-bottom: 1px solid var(--gray-border); margin-bottom: 14px; }
+  .review-item { padding: 14px 0; border-bottom: 1px solid var(--gray-border); text-align: left; }
+  .review-item:last-child { border-bottom: none; }
+  .r-q { font-size: 15px; font-weight: 600; margin-bottom: 8px; line-height: 1.6; display: flex; gap: 8px; align-items: flex-start; }
+  .r-a { font-size: 14px; margin-bottom: 4px; }
+  .r-exp { font-size: 13px; color: var(--text-muted); background: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 8px; line-height: 1.7; }
+  .ri-tick { width: 20px; height: 20px; border-radius: 50%; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .ri-ok { background: var(--green-light); color: var(--green); }
+  .ri-no { background: var(--red-light); color: var(--red); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">N-NET • สกร. อำเภอโนนสัง • ม.ต้น</div>
+    <div class="title">📖 แบบทดสอบภาษาไทย</div>
+    <div class="subtitle" id="subtitle-text">ระบบสุ่มข้อสอบและวิเคราะห์ผลรายบุคคล</div>
+  </div>
+  <div id="app"></div>
+</div>
+<script>
+const database = [
+  {
+    cat: "การอ่านจับใจความ",
+    passage: "ป่าไม้เป็นทรัพยากรธรรมชาติที่สำคัญยิ่งของประเทศ ป่าไม้ทำหน้าที่เป็นแหล่งต้นน้ำลำธาร ช่วยดูดซับน้ำฝนไว้ไม่ให้ไหลบ่าท่วมที่ราบลุ่มอย่างรวดเร็ว นอกจากนี้ยังเป็นที่อยู่อาศัยของสัตว์ป่านานาชนิด และยังช่วยปรับสภาพอากาศให้เย็นสบาย",
+    q: "จากข้อความข้างต้น ป่าไม้มีประโยชน์ด้านใดมากที่สุด?",
+    choices: ["เป็นแหล่งต้นน้ำและควบคุมน้ำท่วม", "เป็นที่อยู่อาศัยของมนุษย์", "ให้ไม้สำหรับก่อสร้าง", "เป็นแหล่งท่องเที่ยว"],
+    a: 0,
+    exp: "ข้อความกล่าวถึงการเป็นแหล่งต้นน้ำและดูดซับน้ำฝนเป็นประเด็นหลัก ซึ่งตรงกับ 'เป็นแหล่งต้นน้ำและควบคุมน้ำท่วม'"
+  },
+  {
+    cat: "การอ่านจับใจความ",
+    passage: "ขยะพลาสติกเป็นปัญหาสิ่งแวดล้อมที่รุนแรงมากในปัจจุบัน เนื่องจากพลาสติกย่อยสลายได้ยาก ต้องใช้เวลานานกว่า 400 ปี สัตว์ทะเลหลายชนิดเข้าใจผิดคิดว่าพลาสติกเป็นอาหาร ทำให้ล้มตายเป็นจำนวนมาก การลดการใช้พลาสติกจึงเป็นเรื่องเร่งด่วนที่ทุกคนต้องร่วมมือกัน",
+    q: "ใจความสำคัญของข้อความนี้คืออะไร?",
+    choices: ["ขยะพลาสติกเป็นปัญหาสิ่งแวดล้อมที่ต้องแก้ไขเร่งด่วน", "สัตว์ทะเลกินพลาสติกแทนอาหาร", "พลาสติกย่อยสลายได้ใน 400 ปี", "ทะเลสกปรกเพราะมนุษย์"],
+    a: 0,
+    exp: "ใจความสำคัญต้องครอบคลุมภาพรวมของข้อความ ไม่ใช่รายละเอียดย่อย — ข้อความทั้งหมดมุ่งชี้ว่าพลาสติกเป็นปัญหาที่ต้องแก้ไขเร่งด่วน"
+  },
+  {
+    cat: "หลักการใช้ภาษา",
+    passage: "",
+    q: "ข้อใดใช้คำราชาศัพท์ถูกต้อง?",
+    choices: ["พระบาทสมเด็จพระเจ้าอยู่หัวทรงพระราชดำเนินไปยังโรงพยาบาล", "พระบาทสมเด็จพระเจ้าอยู่หัวเดินไปยังโรงพยาบาล", "ในหลวงทรงไปโรงพยาบาล", "พระเจ้าอยู่หัวเสด็จไปโรงพยาบาล"],
+    a: 0,
+    exp: "'ทรงพระราชดำเนิน' เป็นคำราชาศัพท์ที่ถูกต้องสำหรับการเดินของพระมหากษัตริย์ ใช้คู่กับ 'ทรง' นำหน้า"
+  },
+  {
+    cat: "หลักการใช้ภาษา",
+    passage: "",
+    q: "คำในข้อใดเป็น 'คำประสม' ทั้งหมด?",
+    choices: ["รถไฟ, น้ำตก, ลูกน้ำ", "วิ่ง, กิน, นอน", "ดี, เลว, สวย", "ไป, มา, กลับ"],
+    a: 0,
+    exp: "คำประสม คือคำที่เกิดจากการนำคำมูลตั้งแต่สองคำขึ้นไปมารวมกัน เช่น รถ+ไฟ=รถไฟ, น้ำ+ตก=น้ำตก, ลูก+น้ำ=ลูกน้ำ"
+  },
+  {
+    cat: "หลักการใช้ภาษา",
+    passage: "",
+    q: "ประโยค 'นักเรียนทุกคนต้องมีระเบียบวินัย' จัดเป็นประโยคชนิดใด?",
+    choices: ["ประโยคความเดียว", "ประโยคความรวม", "ประโยคความซ้อน", "ประโยคคำถาม"],
+    a: 0,
+    exp: "ประโยคความเดียว มีประธานชุดเดียว กริยาชุดเดียว และใจความสมบูรณ์ในตัวเอง — 'นักเรียนทุกคน' คือประธาน 'ต้องมี' คือกริยา"
+  },
+  {
+    cat: "หลักการใช้ภาษา",
+    passage: "",
+    q: "ข้อใดใช้เครื่องหมายวรรคตอนถูกต้อง?",
+    choices: ["เขาซื้อผัก ผลไม้ และเนื้อสัตว์จากตลาด", "เขาซื้อผัก, ผลไม้, และ, เนื้อสัตว์จากตลาด", "เขาซื้อ ผัก ผลไม้ เนื้อสัตว์ จากตลาด", "เขาซื้อผัก, ผลไม้ และเนื้อสัตว์, จากตลาด"],
+    a: 0,
+    exp: "ใช้จุลภาค (,) คั่นระหว่างสิ่งของในลำดับ และใช้ 'และ' ก่อนสิ่งสุดท้าย — 'ผัก ผลไม้ และเนื้อสัตว์' เป็นรูปแบบที่ถูกต้อง"
+  },
+  {
+    cat: "วรรณคดีและวรรณกรรม",
+    passage: "",
+    q: "วรรณคดีไทยเรื่องใดที่พระบาทสมเด็จพระพุทธเลิศหล้านภาลัยทรงพระราชนิพนธ์?",
+    choices: ["อิเหนา", "รามเกียรติ์", "ขุนช้างขุนแผน", "พระอภัยมณี"],
+    a: 0,
+    exp: "อิเหนา เป็นพระราชนิพนธ์ในรัชกาลที่ 2 (พระบาทสมเด็จพระพุทธเลิศหล้านภาลัย) ส่วนรามเกียรติ์เป็นของรัชกาลที่ 1 และพระอภัยมณีเป็นของสุนทรภู่"
+  },
+  {
+    cat: "วรรณคดีและวรรณกรรม",
+    passage: "",
+    q: "บทประพันธ์ต่อไปนี้จัดเป็นคำประพันธ์ประเภทใด?\n'โอ้ว่าน่าเสียดายตายเสียดาย  จะหาไหนได้อีกซักคนหนึ่ง'",
+    choices: ["กลอนสุภาพ", "โคลงสี่สุภาพ", "กาพย์ยานี", "ฉันท์"],
+    a: 0,
+    exp: "กลอนสุภาพ มีบทละ 4 วรรค (สองบาท) แต่ละวรรคมี 7-9 คำ มีสัมผัสนอกและสัมผัสใน — รูปแบบที่นำมาให้ตรงกับกลอนสุภาพ"
+  },
+  {
+    cat: "วรรณคดีและวรรณกรรม",
+    passage: "",
+    q: "สุนทรภู่มีชีวิตอยู่ในสมัยใด?",
+    choices: ["รัชกาลที่ 1–4", "รัชกาลที่ 5–7", "รัชกาลที่ 1–3", "กรุงศรีอยุธยาตอนปลาย"],
+    a: 0,
+    exp: "สุนทรภู่ (พ.ศ. 2329–2398) มีชีวิตในช่วงรัชกาลที่ 1 ถึงรัชกาลที่ 4 มีผลงานสำคัญ เช่น พระอภัยมณี นิราศภูเขาทอง"
+  },
+  {
+    cat: "การเขียน",
+    passage: "",
+    q: "การเขียนจดหมายราชการ ส่วนใดที่ต้องระบุ 'เรื่อง' และ 'เรียน'?",
+    choices: ["ส่วนหัวของจดหมาย", "ส่วนเนื้อหา", "ส่วนลงท้าย", "ส่วนที่อยู่ผู้รับ"],
+    a: 0,
+    exp: "ส่วนหัวจดหมายราชการประกอบด้วย: ที่ ส่วนราชการ วันที่ เรื่อง เรียน (ชื่อผู้รับ) และอ้างถึง/สิ่งที่ส่งมาด้วย (ถ้ามี)"
+  },
+  {
+    cat: "การเขียน",
+    passage: "",
+    q: "ข้อใดเป็นการเขียนย่อความที่ถูกต้อง?",
+    choices: ["เขียนด้วยสำนวนของตนเอง ไม่ลอกข้อความเดิม", "ลอกข้อความทั้งหมดมาให้ครบ", "เพิ่มความคิดเห็นส่วนตัวลงไปด้วย", "ใช้ภาษาพูดให้ดูเป็นธรรมชาติ"],
+    a: 0,
+    exp: "หลักการย่อความ: ต้องใช้ภาษาเขียน ถ่ายทอดด้วยสำนวนของตัวเอง ไม่ลอก ไม่เพิ่มความคิดเห็น และต้องรักษาใจความเดิมไว้"
+  },
+  {
+    cat: "การฟังและการดู",
+    passage: "",
+    q: "การฟังอย่างมีวิจารณญาณหมายถึงข้อใด?",
+    choices: ["ฟังแล้วพิจารณาไตร่ตรองว่าสิ่งที่ได้ยินถูกต้องหรือไม่", "ฟังทุกอย่างที่ได้ยินโดยไม่ตั้งคำถาม", "ฟังเฉพาะสิ่งที่ตัวเองสนใจ", "ฟังแล้วจดบันทึกทุกคำพูด"],
+    a: 0,
+    exp: "การฟังอย่างมีวิจารณญาณ คือการฟังแล้วคิดวิเคราะห์ ตั้งคำถาม และประเมินความน่าเชื่อถือของสิ่งที่ได้ยิน ไม่เชื่อทันที"
+  },
+  {
+    cat: "หลักการใช้ภาษา",
+    passage: "",
+    q: "คำว่า 'มาลา' 'บุปผา' 'สุมน' มีความหมายตรงกับคำใด?",
+    choices: ["ดอกไม้", "ใบไม้", "ต้นไม้", "ผลไม้"],
+    a: 0,
+    exp: "มาลา บุปผา และสุมน ล้วนเป็นคำที่มาจากภาษาบาลี-สันสกฤต แปลว่า 'ดอกไม้' ทั้งสิ้น"
+  },
+  {
+    cat: "หลักการใช้ภาษา",
+    passage: "",
+    q: "ข้อใดเป็น 'คำซ้อน' ทั้งหมด?",
+    choices: ["เสื่อสาด, บ้านเรือน, ข้าวปลา", "นักเรียน, นักกีฬา, นักร้อง", "วิ่งเล่น, กินนอน, ดูหนัง", "แดงดี, ขาวสะอาด, เขียวสด"],
+    a: 0,
+    exp: "คำซ้อน คือคำที่นำคำที่มีความหมายใกล้เคียงหรือตรงข้ามกันมาซ้อนกัน เช่น เสื่อ+สาด, บ้าน+เรือน, ข้าว+ปลา"
+  },
+  {
+    cat: "หลักการใช้ภาษา",
+    passage: "",
+    q: "ประโยค 'ครูให้การบ้านนักเรียน' คำว่า 'นักเรียน' ทำหน้าที่ใดในประโยค?",
+    choices: ["กรรมรอง", "ประธาน", "กรรมตรง", "ส่วนขยาย"],
+    a: 0,
+    exp: "ประโยคนี้: ครู=ประธาน, ให้=กริยา, การบ้าน=กรรมตรง (สิ่งที่ถูกกระทำ), นักเรียน=กรรมรอง (ผู้รับกรรมตรง)"
+  },
+  {
+    cat: "การอ่านจับใจความ",
+    passage: "ในยุคดิจิทัล เด็กๆ ใช้เวลากับสมาร์ตโฟนและโซเชียลมีเดียเป็นเวลานาน ส่งผลให้ทักษะการอ่านหนังสือลดลง ผู้เชี่ยวชาญแนะนำว่าพ่อแม่ควรจำกัดเวลาใช้หน้าจอและส่งเสริมให้เด็กอ่านหนังสือจริงทุกวัน เพื่อพัฒนาสมาธิและจินตนาการ",
+    q: "ผู้เชี่ยวชาญแนะนำให้ทำสิ่งใด?",
+    choices: ["จำกัดเวลาหน้าจอและส่งเสริมการอ่านหนังสือ", "ห้ามเด็กใช้สมาร์ตโฟนโดยเด็ดขาด", "ให้เด็กใช้โซเชียลมีเดียเพื่อการเรียนรู้", "ซื้อหนังสือให้เด็กมากๆ"],
+    a: 0,
+    exp: "ข้อความระบุชัดว่า 'พ่อแม่ควรจำกัดเวลาใช้หน้าจอและส่งเสริมให้เด็กอ่านหนังสือจริงทุกวัน' ซึ่งตรงกับตัวเลือกแรก"
+  },
+  {
+    cat: "วรรณคดีและวรรณกรรม",
+    passage: "",
+    q: "โคลงสี่สุภาพมีลักษณะบังคับข้อใด?",
+    choices: ["ตรีและโทบังคับ ๗ แห่ง และมีสัมผัสระหว่างบท", "ทุกวรรคต้องมีคำ ๗ คำ", "ไม่มีการบังคับวรรณยุกต์", "ใช้คำเป็นทั้งหมด"],
+    a: 0,
+    exp: "โคลงสี่สุภาพมีตำแหน่งบังคับวรรณยุกต์เอกและโท รวม 7 แห่ง และมีสัมผัสระหว่างบท (คำสุดท้ายบาทที่ 1 สัมผัสกับคำที่ 3 ของบาทที่ 2 และ 3)"
+  },
+  {
+    cat: "การพูด",
+    passage: "",
+    q: "การพูดในที่สาธารณะที่ดี ควรทำสิ่งใดก่อนพูด?",
+    choices: ["วางแผนและเตรียมเนื้อหาให้ชัดเจน", "พูดสิ่งที่นึกได้ทันทีโดยไม่ต้องเตรียม", "ท่องจำสคริปต์ทุกคำให้ขึ้นใจ", "ดูโน้ตตลอดเวลาที่พูด"],
+    a: 0,
+    exp: "การพูดในที่สาธารณะที่มีประสิทธิภาพต้องวางแผนและเตรียมเนื้อหา จัดลำดับความคิด และฝึกซ้อมก่อนพูดจริง"
+  },
+  {
+    cat: "หลักการใช้ภาษา",
+    passage: "",
+    q: "ข้อใดเป็นการใช้ภาษาระดับ 'ทางการ' ที่ถูกต้อง?",
+    choices: ["ขอเรียนให้ทราบว่าการประชุมจะจัดขึ้นในวันศุกร์นี้", "งั้นเดี๋ยวมาประชุมกันวันศุกร์นะ", "โอเค ศุกร์นี้ประชุมเลยนะครับ", "ฝากบอกด้วยว่าศุกร์นี้มีประชุม"],
+    a: 0,
+    exp: "ภาษาทางการใช้ในงานเขียนและการพูดที่เป็นทางการ มีสำนวนสุภาพ ชัดเจน ไม่ใช้คำสแลงหรือคำย่อ"
+  },
+  {
+    cat: "หลักการใช้ภาษา",
+    passage: "",
+    q: "คำว่า 'เกษตร' 'กสิกรรม' 'เพาะปลูก' เป็นคำที่มีความสัมพันธ์แบบใด?",
+    choices: ["คำที่มีความหมายเหมือนกัน (ไวพจน์)", "คำที่มีความหมายตรงข้ามกัน", "คำที่มีความหมายแคบกว่ากัน", "คำที่มีเสียงเหมือนกัน"],
+    a: 0,
+    exp: "เกษตร กสิกรรม และเพาะปลูก ล้วนหมายถึงการทำการเกษตร จึงเป็นไวพจน์ (คำที่มีความหมายเหมือนหรือใกล้เคียงกัน)"
+  }
+];
+
+let state = {
+  screen: 'login',
+  studentName: '', studentId: '',
+  questions: [], answers: [], checked: [], current: 0
+};
+
+function shuffleArray(arr) {
+  let a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startApp() {
+  const name = document.getElementById('s_name').value.trim();
+  if (!name) { alert('กรุณากรอกชื่อ-นามสกุลก่อนเข้าสอบครับ'); return; }
+  state.studentName = name;
+  state.studentId = document.getElementById('s_id').value || 'สกร. อำเภอโนนสัง';
+  document.getElementById('subtitle-text').innerText = 'ผู้เข้าสอบ: ' + state.studentName;
+  let shuffledDB = shuffleArray(database);
+  state.questions = shuffledDB.map(q => {
+    let correctText = q.choices[q.a];
+    let newChoices = shuffleArray(q.choices);
+    return { cat: q.cat, q: q.q, exp: q.exp, passage: q.passage, choices: newChoices, correctAnswer: newChoices.indexOf(correctText) };
+  });
+  state.answers = new Array(state.questions.length).fill(null);
+  state.checked = new Array(state.questions.length).fill(false);
+  state.current = 0;
+  state.screen = 'quiz';
+  renderApp();
+}
+
+function renderApp() {
+  const app = document.getElementById('app');
+  if (state.screen === 'login') { app.innerHTML = loginHTML(); return; }
+  if (state.screen === 'quiz') { app.innerHTML = quizHTML(); return; }
+  if (state.screen === 'result') { app.innerHTML = resultHTML(); return; }
+}
+
+function loginHTML() {
+  return `<div class="card" style="text-align:center;padding:40px 20px;">
+    <div style="font-size:60px;margin-bottom:10px;">📖</div>
+    <h2 style="color:var(--primary);margin-bottom:10px;">ข้อมูลผู้เข้าสอบ</h2>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:24px;">ระบบจะสุ่มข้อสอบและสุ่มตัวเลือกใหม่ทุกครั้ง</p>
+    <div class="inp-group">
+      <label class="inp-label">ชื่อ-นามสกุล (บังคับ)</label>
+      <input type="text" id="s_name" class="inp-text" placeholder="ระบุชื่อและนามสกุล">
+    </div>
+    <div class="inp-group">
+      <label class="inp-label">รหัสนักศึกษา / สังกัด</label>
+      <input type="text" id="s_id" class="inp-text" value="สกร. อำเภอโนนสัง">
+    </div>
+    <button class="btn btn-primary" style="margin-top:10px;" onclick="startApp()">เริ่มทำแบบทดสอบ 🚀</button>
+  </div>`;
+}
+
+function quizHTML() {
+  const total = state.questions.length, curr = state.current;
+  const q = state.questions[curr];
+  const ans = state.answers[curr], isChecked = state.checked[curr];
+  const pct = Math.round(((curr + 1) / total) * 100);
+  const L = ['A','B','C','D'];
+  const passageHTML = q.passage ? `<div class="q-passage">${q.passage}</div>` : '';
+  let choicesHTML = q.choices.map((c, i) => {
+    let cls = 'choice';
+    if (isChecked) { if (i === q.correctAnswer) cls += ' correct'; else if (i === ans) cls += ' wrong'; }
+    else if (i === ans) cls += ' selected';
+    return `<button class="${cls}" ${isChecked ? 'disabled' : ''} onclick="selectAnswer(${i})"><div class="c-let">${L[i]}</div><div>${c}</div></button>`;
+  }).join('');
+  let fbHTML = '';
+  if (isChecked) {
+    fbHTML = ans === q.correctAnswer
+      ? `<div class="feedback ok">✅ <strong>ถูกต้อง!</strong><span class="fb-explain">💡 ${q.exp}</span></div>`
+      : `<div class="feedback no">❌ <strong>ยังไม่ถูกต้อง</strong> — คำตอบที่ถูกคือ: <strong>${q.choices[q.correctAnswer]}</strong><span class="fb-explain">💡 ${q.exp}</span></div>`;
+  }
+  const navLeft = curr > 0 ? `<button class="btn btn-secondary" onclick="goPrev()">← ย้อนกลับ</button>` : `<div style="width:48%"></div>`;
+  let navRight = '';
+  if (isChecked) {
+    navRight = curr === total - 1
+      ? `<button class="btn btn-primary" onclick="showResult()">ประมวลผลคะแนน 🏆</button>`
+      : `<button class="btn btn-primary" onclick="goNext()">ถัดไป →</button>`;
+  } else {
+    navRight = `<button class="btn btn-primary" ${ans === null ? 'disabled' : ''} onclick="checkAnswer()">ตรวจคำตอบ ✓</button>`;
+  }
+  const dots = state.questions.map((_, i) => {
+    let cls = 'dot' + (i === curr ? ' active' : state.checked[i] ? (state.answers[i] === state.questions[i].correctAnswer ? ' ok' : ' no') : '');
+    return `<button class="${cls}" onclick="jumpTo(${i})">${i+1}</button>`;
+  }).join('');
+  return `
+    <div class="card" style="padding:16px 20px;">
+      <div class="prog-text"><span>ข้อที่ ${curr+1} จาก ${total}</span><span>ตอบแล้ว ${state.answers.filter(a=>a!==null).length} ข้อ</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="card">
+      <div class="q-badge">${q.cat}</div>
+      ${passageHTML}
+      <div class="q-text"><span class="q-num-circle">${curr+1}</span>${q.q}</div>
+      <div>${choicesHTML}</div>
+      ${fbHTML}
+      <div class="nav-buttons">${navLeft}${navRight}</div>
+    </div>
+    <div class="dot-nav">${dots}</div>`;
+}
+
+function resultHTML() {
+  const total = state.questions.length;
+  let score = 0, catStats = {};
+  state.questions.forEach((q, i) => {
+    if (!catStats[q.cat]) catStats[q.cat] = { t: 0, c: 0 };
+    catStats[q.cat].t++;
+    if (state.answers[i] === q.correctAnswer) { score++; catStats[q.cat].c++; }
+  });
+  const pct = Math.round((score / total) * 100);
+  let grade, gc, msg;
+  if (pct >= 80) { grade='ดีมาก (A)'; gc='grade-A'; msg='ยอดเยี่ยม! มีความสามารถทางภาษาไทยระดับสูง'; }
+  else if (pct >= 60) { grade='ดี (B)'; gc='grade-B'; msg='ทำได้ดีครับ มีความเข้าใจในเกณฑ์มาตรฐาน'; }
+  else if (pct >= 50) { grade='พอใช้ (C)'; gc='grade-C'; msg='ผ่านเกณฑ์ขั้นต่ำ ควรศึกษาทบทวนเพิ่มเติม'; }
+  else { grade='ต้องปรับปรุง (D)'; gc='grade-D'; msg='ไม่เป็นไรครับ ลองอ่านคำอธิบายและทำใหม่อีกครั้งนะ'; }
+  const weak = Object.entries(catStats).filter(([,v]) => v.t > 0 && v.c/v.t <= 0.5).map(([k]) => k);
+  const fbMsg = weak.length > 0
+    ? `📉 <strong>ระบบวิเคราะห์จุดอ่อน:</strong> มีข้อผิดพลาดบ่อยในสาระ <strong>${weak.join(' และ ')}</strong> แนะนำให้ทบทวนเนื้อหาส่วนนี้เพิ่มเติม`
+    : `✨ <strong>ระบบวิเคราะห์:</strong> ยอดเยี่ยมมาก! ไม่มีจุดอ่อนที่น่ากังวลในสาระใดเลย`;
+  const today = new Date();
+  const dateStr = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()+543}`;
+  const review = state.questions.map((q, i) => {
+    const ok = state.answers[i] === q.correctAnswer;
+    const ua = state.answers[i] !== null ? q.choices[state.answers[i]] : '(ไม่ได้ตอบ)';
+    return `<div class="review-item">
+      <div class="r-q"><span class="ri-tick ${ok?'ri-ok':'ri-no'}">${ok?'✓':'✗'}</span>ข้อ ${i+1}: ${q.q}</div>
+      <div class="r-a" style="color:var(--text-muted)">คุณตอบ: ${ua}</div>
+      <div class="r-a" style="color:var(--green);font-weight:600;">เฉลย: ${q.choices[q.correctAnswer]}</div>
+      <div class="r-exp">💡 ${q.exp}</div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="card" style="text-align:center;padding:32px 20px;">
+      <div class="cert-header">รายงานผลการทดสอบภาษาไทย</div>
+      <div class="cert-name">คุณ ${state.studentName}</div>
+      <div class="cert-meta">รหัส/สังกัด: ${state.studentId} | วันที่สอบ: ${dateStr}</div>
+      <div style="font-size:60px;margin:10px 0;">${pct >= 50 ? '🏆' : '📖'}</div>
+      <div class="score-big">${score}</div>
+      <div class="score-denom">จาก ${total} ข้อ (${pct}%)</div>
+      <div style="margin:16px 0;"><span class="grade-pill ${gc}">${grade}</span></div>
+      <div style="color:var(--text-muted);margin-bottom:24px;">${msg}</div>
+      <div class="feedback-box">${fbMsg}</div>
+      <div class="grid-stats">
+        <div class="stat-box"><div class="stat-num" style="color:var(--green)">${score}</div><div class="slbl">ตอบถูก</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--red)">${total-score}</div><div class="slbl">ตอบผิด</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--primary)">${pct}%</div><div class="slbl">คะแนน</div></div>
+      </div>
+      <button class="btn btn-primary" onclick="location.reload()">🔄 สุ่มข้อสอบทำใหม่อีกครั้ง</button>
+    </div>
+    <div class="card" style="margin-top:4px;">
+      <div class="review-title">📋 ตรวจสอบคำตอบอย่างละเอียด</div>
+      ${review}
+    </div>`;
+}
+
+function selectAnswer(i) { if (!state.checked[state.current]) { state.answers[state.current]=i; renderApp(); } }
+function checkAnswer() { if (state.answers[state.current]!==null) { state.checked[state.current]=true; renderApp(); } }
+function goNext() { if (state.current < state.questions.length-1) { state.current++; renderApp(); } }
+function goPrev() { if (state.current > 0) { state.current--; renderApp(); } }
+function jumpTo(i) { state.current=i; renderApp(); }
+function showResult() { state.screen='result'; renderApp(); }
+
+renderApp();
+</script>
+</body>
+</html>
