@@ -44,6 +44,391 @@
   .q-badge { font-size: 12px; color: var(--primary); font-weight: 700; margin-bottom: 12px; }
   .q-text { font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
 
+  .choices { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px;
+    align-items: stretch; 
+  }
+  
+  .choice { 
+    display: flex; 
+    align-items: center; 
+    background: #fff; 
+    border: 2px solid var(--gray-border); 
+    padding: 12px 16px; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    font-size: 15px; 
+    font-family: 'Sarabun', sans-serif; 
+    text-align: left; 
+    transition: 0.2s; 
+    width: 100%;
+    min-height: 65px; 
+  }
+  
+  .choice.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+  .choice.correct { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 600; }
+  .choice.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); font-weight: 600; }
+  .choice:disabled { cursor: not-allowed; }
+  
+  .c-let { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%; margin-right: 15px; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .choice.selected .c-let { background: var(--primary); color: #fff; }
+  .choice.correct .c-let { background: var(--green); color: #fff; }
+  .choice.wrong .c-let { background: var(--red); color: #fff; }
+
+  .feedback { padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; margin-top: 16px; }
+  .feedback.ok { background: var(--green-light); border: 1px solid var(--green); color: #1f3a09; }
+  .feedback.no { background: var(--red-light); border: 1px solid var(--red); color: #521717; }
+  .fb-explain { font-size: 13px; color: var(--text-muted); background: rgba(255,255,255,0.6); padding: 10px; border-radius: 8px; margin-top: 10px; display: block; }
+  
+  /* เพิ่มคลาสสำหรับกล่องวิเคราะห์ผู้เรียน */
+  .feedback-box { background: var(--primary-light); border-left: 4px solid var(--primary); border-radius: 0 10px 10px 0; padding: 16px; text-align: left; margin-bottom: 24px; font-size: 14px; color: var(--primary-dark); }
+  
+  .grid-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+  .stat-box { background: #f9f9f9; padding: 16px 10px; border-radius: 12px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  
+  .review-item { padding: 16px 0; border-bottom: 1px solid var(--gray-border); text-align: left; }
+  .review-item:last-child { border-bottom: none; }
+  .r-q { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .r-a { font-size: 14px; margin-bottom: 4px; }
+
+  .dot-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; justify-content: center; }
+  .dot { width: 32px; height: 32px; border-radius: 8px; border: none; font-family: 'Sarabun'; font-weight: 600; font-size: 12px; cursor: pointer; background: #e0e0e0; }
+  .dot.active { background: var(--primary); color: #fff; transform: scale(1.1); }
+  .dot.ok { background: var(--green); color: #fff; }
+  .dot.no { background: var(--red); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="badge">N-NET • สกร. มัธยมศึกษาตอนต้น</div>
+    <div class="title">🇹🇭 แบบทดสอบภาษาไทย</div>
+    <div class="subtitle" id="subtitle-text">ระบบสุ่มข้อสอบและวิเคราะห์ผลรายบุคคล</div>
+  </div>
+  
+  <div id="app"></div>
+</div>
+
+<script>
+// คลังข้อสอบภาษาไทย ระดับ ม.ต้น จำนวน 20 ข้อ
+const database = [
+  { cat: "การอ่าน", q: "ข้อความใดแสดงถึง 'ข้อเท็จจริง' ?", choices: ["วันนี้ฝนตกหนักจนน้ำท่วมถนนหน้าโรงเรียน", "การเรียนวิชาภาษาไทยสนุกที่สุด", "ดอกกุหลาบสีแดงสวยกว่าดอกกุหลาบสีขาว", "อาหารไทยอร่อยและมีประโยชน์ต่อร่างกายมาก"], a: 0, exp: "ข้อเท็จจริงคือสิ่งที่สามารถพิสูจน์ได้ มีหลักฐานยืนยัน (ฝนตกน้ำท่วม) ส่วนข้ออื่นเป็นเพียงข้อคิดเห็นหรือความรู้สึกส่วนตัว" },
+  { cat: "การเขียน", q: "คำในข้อใดเขียนถูกต้องตามพจนานุกรมทั้งหมด ?", choices: ["สังเกต, อนุญาต, โอกาส", "กฏหมาย, ปรากฎ, อากาศ", "กะเพรา, อุปสรรค, รสชาด", "ศรีษะ, กิจวัตร, บิณฑบาตร"], a: 0, exp: "ข้อที่ถูกต้องคือ สังเกต (ไม่มีสระอุ), อนุญาต (ไม่มีสระอิ), โอกาส (ใช้ ส เสือ) ตัวลวงที่มักผิด: กฎหมาย (ฎ ชฎา), รสชาติ (ติ), บิณฑบาต (ไม่มี ร)" },
+  { cat: "หลักภาษาไทย", q: "ข้อใดเป็น 'คำประสม' ทั้งหมด ?", choices: ["แม่น้ำ, พัดลม, ไฟฉาย", "กว้างขวาง, สูงต่ำ, ดำขาว", "ว่องไว, รวดเร็ว, อ้วนท้วน", "ตูมๆ, แดงๆ, เล็กๆ"], a: 0, exp: "คำประสม คือการนำคำที่มีความหมายต่างกันมารวมกันแล้วเกิดความหมายใหม่ เช่น แม่+น้ำ, พัด+ลม ส่วนข้ออื่นเป็นคำซ้อนและคำซ้ำ" },
+  { cat: "วรรณคดีและวรรณกรรม", q: "สำนวนใดมีความหมายตรงกับ 'การทำสิ่งใดสิ่งหนึ่งที่ยากลำบากเกินความสามารถของตน' ?", choices: ["เข็นครกขึ้นภูเขา", "ขี่ช้างจับตั๊กแตน", "งมเข็มในมหาสมุทร", "ตำน้ำพริกละลายแม่น้ำ"], a: 0, exp: "'เข็นครกขึ้นภูเขา' หมายถึง ทำงานที่ยากลำบากเกินกำลัง ส่วน 'งมเข็มในมหาสมุทร' หมายถึง ค้นหาสิ่งที่ยากจะค้นพบ" },
+  { cat: "การสื่อสาร", q: "หากนักศึกษาต้องการเขียนจดหมายลากิจถึงคุณครูประจำกลุ่ม ควรใช้คำขึ้นต้นและคำลงท้ายตามข้อใด ?", choices: ["เรียน...ที่เคารพ / ขอแสดงความนับถือ", "กราบเท้า...ที่เคารพ / ด้วยความเคารพอย่างสูง", "ถึง...ที่รัก / ด้วยความรักและคิดถึง", "สวัสดี...คุณครู / ขอบพระคุณครับ"], a: 0, exp: "การเขียนจดหมายถึงครูอาจารย์ ใช้คำขึ้นต้น 'เรียน...' และคำลงท้าย 'ขอแสดงความนับถือ' ส่วน 'กราบเท้า...' ใช้กับบิดามารดา" },
+  { cat: "หลักภาษาไทย", q: "ประโยคในข้อใดเป็น 'ประโยคความซ้อน' ?", choices: ["นักเรียนที่ตั้งใจเรียนจะสอบผ่าน", "พี่ล้างจานแต่น้องดูโทรทัศน์", "พ่อและแม่ไปตลาด", "นกฝูงใหญ่บินกลับรังในตอนเย็น"], a: 0, exp: "ประโยคความซ้อนมีประโยคหลักและประโยคย่อย โดยมีประพันธสรรพนาม (ที่, ซึ่ง, อัน, ผู้) เป็นตัวเชื่อม ในที่นี้คือคำว่า 'ที่'" },
+  { cat: "หลักภาษาไทย", q: "คำราชาศัพท์ในข้อใด หมายถึง 'ร้องไห้' ?", choices: ["ทรงพระกันแสง", "ทรงพระสรวล", "ทรงพระอักษร", "ทรงพระสุบิน"], a: 0, exp: "ทรงพระกันแสง = ร้องไห้, ทรงพระสรวล = หัวเราะ, ทรงพระอักษร = เขียน/อ่านหนังสือ, ทรงพระสุบิน = ฝัน" },
+  { cat: "การอ่าน", q: "การอ่านจับใจความสำคัญ ควรตั้งคำถามให้ตนเองตามข้อใด ?", choices: ["ใคร ทำอะไร ที่ไหน เมื่อไร อย่างไร", "ผู้เขียนเกิดที่ไหนและอายุเท่าไร", "หนังสือเล่มนี้ราคาเท่าไรและซื้อจากที่ใด", "ตัวละครในเรื่องสวมเสื้อผ้าสีอะไร"], a: 0, exp: "หลักการอ่านจับใจความคือการสรุปให้ได้ตามหลัก 5W1H (ใคร ทำอะไร ที่ไหน เมื่อไร อย่างไร และทำไม)" },
+  { cat: "วรรณคดีและวรรณกรรม", q: "ข้อความ 'เสียงคลื่นซัดสาดหาดทราย ซ่า ซ่า' ใช้โวหารภาพพจน์ชนิดใด ?", choices: ["สัทพจน์ (การเลียนเสียงธรรมชาติ)", "อุปมา (การเปรียบเทียบว่าเหมือน)", "อุปลักษณ์ (การเปรียบเทียบว่าเป็น/คือ)", "อติพจน์ (การกล่าวเกินจริง)"], a: 0, exp: "สัทพจน์ คือภาพพจน์ที่ใช้การเลียนเสียงธรรมชาติ เช่น เสียงคลื่น ซ่า ซ่า, เสียงนกร้อง จิ๊บ จิ๊บ" },
+  { cat: "หลักภาษาไทย", q: "คำว่า 'การ' และ 'ความ' เมื่อนำมาเติมหน้าคำกริยาหรือคำวิเศษณ์ จะเรียกว่าอะไร ?", choices: ["อาการนาม", "สมุหนาม", "สามานยนาม", "วิสามานยนาม"], a: 0, exp: "อาการนาม คือ คำนามที่เกิดจากการเติมคำว่า 'การ' (หน้ากริยา) หรือ 'ความ' (หน้ากริยา/วิเศษณ์) เช่น การเดิน, ความรัก" },
+  { cat: "การสื่อสาร", q: "ข้อใดเป็น 'ภาษาระดับทางการ' (เหมาะสำหรับการเขียนรายงานวิชาการ) ?", choices: ["สุนัขตัวนี้เสียชีวิตแล้ว", "หมาตัวนี้ม่องเท่งไปแล้ว", "สุนัขตัวนี้ตายเสียแล้ว", "หมาตัวนี้ตายซะแล้ว"], a: 0, exp: "ภาษาระดับทางการต้องใช้คำสุภาพ 'สุนัข' แทน หมา และ 'เสียชีวิต' หรือ 'ตาย' (แต่ในการเขียนทางการมักเลี่ยงคำสแลงและภาษาพูด)" },
+  { cat: "หลักภาษาไทย", q: "คำในข้อใดเป็น 'คำยืมจากภาษาบาลี-สันสกฤต' ทั้งหมด ?", choices: ["บิดา, มารดา, กษัตริย์", "ก๋วยเตี๋ยว, เกาเหลา, ซีอิ๊ว", "โต๊ะ, เก้าอี้, ตู้", "คอมพิวเตอร์, ฟุตบอล, คลินิก"], a: 0, exp: "บิดา มารดา กษัตริย์ เป็นคำยืมจากภาษาบาลี-สันสกฤต ส่วนตัวเลือกอื่นเป็นภาษาจีนและภาษาอังกฤษ" },
+  { cat: "วรรณคดีและวรรณกรรม", q: "'รักยาวให้บั่น รักสั้นให้ต่อ' สุภาษิตนี้มีความหมายสอนเรื่องใด ?", choices: ["การรู้จักผูกมิตรและให้อภัยกัน", "การตัดเสื้อผ้าให้พอดีตัว", "การเลือกคบคนที่มีรูปร่างหน้าตา", "การเดินทางที่ต้องวางแผน"], a: 0, exp: "'รักยาวให้บั่น' (อยากคบกันนานๆ ให้ตัดความโกรธทิ้ง) 'รักสั้นให้ต่อ' (อยากคบกันสั้นๆ ให้ต่อความยาวสาวความยืด) สอนเรื่องการให้อภัยผูกมิตร" },
+  { cat: "การเขียน", q: "องค์ประกอบของการเขียนเรียงความที่ถูกต้อง ต้องประกอบด้วยส่วนใดบ้างตามลำดับ ?", choices: ["คำนำ, เนื้อเรื่อง, สรุป", "คำนำ, สารบัญ, บรรณานุกรม", "หัวข้อ, เนื้อหา, อ้างอิง", "ชื่อเรื่อง, สรุป, เนื้อเรื่อง"], a: 0, exp: "รูปแบบมาตรฐานของการเขียนเรียงความประกอบด้วย 3 ส่วนหลักคือ คำนำ (เปิดเรื่อง), เนื้อเรื่อง (ขยายความ), และสรุป (ปิดเรื่อง)" },
+  { cat: "หลักภาษาไทย", q: "เครื่องหมายวรรคตอนใด ใช้สำหรับเขียนไว้หลังคำอุทาน ?", choices: ["อัศเจรีย์ ( ! )", "ปรัศนี ( ? )", "อัญประกาศ ( \" \" )", "นขลิขิต ( ( ) )"], a: 0, exp: "อัศเจรีย์ (!) หรือเครื่องหมายตกใจ ใช้เขียนหลังคำอุทานหรือข้อความที่แสดงอารมณ์ตกใจ ประหลาดใจ" },
+  { cat: "การสื่อสาร", q: "เมื่อนักศึกษาฟังการโต้วาทีหรือการหาเสียงเลือกตั้ง นักศึกษาควรใช้ทักษะการฟังประเภทใดมากที่สุด ?", choices: ["การฟังอย่างมีวิจารณญาณ", "การฟังเพื่อความบันเทิง", "การฟังเพื่อจับใจความทั่วไป", "การฟังเพื่อความซาบซึ้ง"], a: 0, exp: "การฟังอย่างมีวิจารณญาณ คือการฟังแล้วรู้จักคิดวิเคราะห์ แยกแยะข้อเท็จจริง ข้อคิดเห็น และพิจารณาความน่าเชื่อถือ" },
+  { cat: "การอ่าน", q: "ข้อใดคือความหมายของ 'การอ่านเพื่อตีความ' ?", choices: ["การค้นหาความหมายแฝงที่ผู้เขียนไม่ได้บอกไว้โดยตรง", "การอ่านออกเสียงให้ถูกต้องตามอักขรวิธี", "การอ่านเพื่อสรุปเรื่องราวทั้งหมดอย่างย่อ", "การอ่านเพื่อค้นหาความหมายของคำศัพท์ในพจนานุกรม"], a: 0, exp: "การตีความ (Interpretation) คือการพยายามเข้าใจเจตนาหรือความหมายแฝงที่ซ่อนอยู่เบื้องหลังตัวอักษร" },
+  { cat: "หลักภาษาไทย", q: "ประโยค 'เขาทำงานตัวเป็นเกลียว' คำว่า 'ตัวเป็นเกลียว' ทำหน้าที่ใดในประโยค ?", choices: ["คำวิเศษณ์ขยายกริยา", "คำนามทำหน้าที่เป็นประธาน", "คำกริยาหลักของประโยค", "คำบุพบทบอกสถานที่"], a: 0, exp: "'ตัวเป็นเกลียว' เป็นกลุ่มคำที่ทำหน้าที่เป็นคำวิเศษณ์ ขยายคำกริยา 'ทำงาน' ให้เห็นภาพว่าทำงานหนักมาก" },
+  { cat: "การเขียน", q: "ข้อใดคือรูปแบบการเขียนอ้างอิง (บรรณานุกรม) หนังสือที่ถูกต้อง ?", choices: ["ชื่อผู้แต่ง. (ปีที่พิมพ์). ชื่อหนังสือ. สถานที่พิมพ์: สำนักพิมพ์.", "ชื่อหนังสือ. (ปีที่พิมพ์). ชื่อผู้แต่ง. สำนักพิมพ์: สถานที่พิมพ์.", "สำนักพิมพ์. ชื่อหนังสือ. ชื่อผู้แต่ง. (ปีที่พิมพ์).", "ปีที่พิมพ์. ชื่อผู้แต่ง. สถานที่พิมพ์. ชื่อหนังสือ."], a: 0, exp: "รูปแบบบรรณานุกรมหนังสือมาตรฐาน จะขึ้นต้นด้วย ชื่อผู้แต่ง. ตามด้วย (ปีที่พิมพ์). ชื่อหนังสือ. สถานที่พิมพ์: สำนักพิมพ์." },
+  { cat: "วรรณคดีและวรรณกรรม", q: "รสวรรณคดี 'พิโรธวาทัง' หมายถึงการแสดงอารมณ์ใดของตัวละคร ?", choices: ["ความโกรธแค้น ตัดพ้อ", "ความรัก ความเสน่หา", "ความเศร้าโศก เสียใจ", "ความตลกขบขัน"], a: 0, exp: "พิโรธวาทัง คือ รสแห่งความโกรธ ตัดพ้อ หรือความไม่พอใจ" }
+];
+
+let state = {
+  screen: 'login', 
+  studentName: '',
+  studentId: '',
+  questions: [], 
+  answers: [], 
+  checked: [], 
+  current: 0
+};
+
+// ฟังก์ชันสุ่ม (Fisher-Yates)
+function shuffleArray(arr) {
+  let newArr = arr.slice();
+  for (let i = newArr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+}
+
+function startApp() {
+  const nameInput = document.getElementById('s_name').value;
+  const idInput = document.getElementById('s_id').value;
+  
+  if (nameInput.trim() === '') {
+    alert('กรุณากรอกชื่อ-นามสกุลก่อนเข้าสอบครับ');
+    return;
+  }
+  
+  state.studentName = nameInput;
+  state.studentId = idInput || 'สกร. มัธยมศึกษาตอนต้น';
+  document.getElementById('subtitle-text').innerText = 'ผู้เข้าสอบ: ' + state.studentName;
+  
+  // สุ่มคำถามและตัวเลือก
+  let shuffledDB = shuffleArray(database);
+  state.questions = [];
+  
+  for (let i = 0; i < shuffledDB.length; i++) {
+    let q = shuffledDB[i];
+    let correctText = q.choices[q.a];
+    let newChoices = shuffleArray(q.choices);
+    let newCorrectIndex = newChoices.indexOf(correctText);
+    
+    state.questions.push({
+      cat: q.cat,
+      q: q.q,
+      exp: q.exp,
+      choices: newChoices,
+      correctAnswer: newCorrectIndex
+    });
+  }
+  
+  state.answers = new Array(state.questions.length).fill(null);
+  state.checked = new Array(state.questions.length).fill(false);
+  state.current = 0;
+  state.screen = 'quiz';
+  
+  renderApp();
+}
+
+function renderApp() {
+  const app = document.getElementById('app');
+  
+  if (state.screen === 'login') {
+    app.innerHTML = `
+      <div class="card" style="text-align: center; padding: 40px 20px;">
+        <div style="font-size: 60px; margin-bottom: 10px;">📚</div>
+        <h2 style="color: var(--primary); margin-bottom: 10px;">ข้อมูลผู้เข้าสอบ</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">ระบบจะสุ่มข้อสอบและสุ่มตัวเลือกใหม่ทุกครั้ง เพื่อฝึกฝนสำหรับ N-NET</p>
+        <div class="inp-group">
+          <label class="inp-label">ชื่อ-นามสกุล (บังคับ)</label>
+          <input type="text" id="s_name" class="inp-text" placeholder="ระบุชื่อและนามสกุล">
+        </div>
+        <div class="inp-group">
+          <label class="inp-label">รหัสนักศึกษา / สังกัด</label>
+          <input type="text" id="s_id" class="inp-text" value="สกร. มัธยมศึกษาตอนต้น">
+        </div>
+        <button class="btn btn-primary" style="margin-top: 10px;" onclick="startApp()">เริ่มทำแบบทดสอบ 🚀</button>
+      </div>
+    `;
+  } 
+  else if (state.screen === 'quiz') {
+    let total = state.questions.length;
+    let curr = state.current;
+    let q = state.questions[curr];
+    let ans = state.answers[curr];
+    let isChecked = state.checked[curr];
+    let pct = Math.round(((curr + 1) / total) * 100);
+    
+    let letters = ['ก', 'ข', 'ค', 'ง'];
+    let choicesHTML = '';
+    
+    for (let i = 0; i < 4; i++) {
+      let cssClass = 'choice';
+      if (isChecked) {
+        if (i === q.correctAnswer) cssClass += ' correct';
+        else if (i === ans && ans !== q.correctAnswer) cssClass += ' wrong';
+      } else {
+        if (i === ans) cssClass += ' selected';
+      }
+      
+      let disabledAttr = isChecked ? 'disabled' : '';
+      choicesHTML += `<button class="${cssClass}" ${disabledAttr} onclick="selectAnswer(${i})">
+                        <div class="c-let">${letters[i]}</div>
+                        <div>${q.choices[i]}</div>
+                      </button>`;
+    }
+    
+    let fbHTML = '';
+    if (isChecked) {
+      if (ans === q.correctAnswer) {
+        fbHTML = `<div class="feedback ok">✅ <strong>ถูกต้อง!</strong><div class="fb-explain">💡 <strong>คำอธิบาย:</strong> ${q.exp}</div></div>`;
+      } else {
+        fbHTML = `<div class="feedback no">❌ <strong>ยังไม่ถูกต้อง</strong> — คำตอบที่ถูกคือ: <strong>${q.choices[q.correctAnswer]}</strong><div class="fb-explain">💡 <strong>คำอธิบาย:</strong> ${q.exp}</div></div>`;
+      }
+    }
+    
+    let btnPrev = curr > 0 ? `<button class="btn btn-secondary" onclick="goPrev()">← ย้อนกลับ</button>` : `<div style="width:48%"></div>`;
+    let btnNext = '';
+    
+    if (isChecked) {
+      if (curr === total - 1) {
+        btnNext = `<button class="btn btn-primary" onclick="showResult()">ประมวลผลคะแนน 🏆</button>`;
+      } else {
+        btnNext = `<button class="btn btn-primary" onclick="goNext()">ถัดไป →</button>`;
+      }
+    } else {
+      let dis = ans === null ? 'disabled' : '';
+      btnNext = `<button class="btn btn-primary" ${dis} onclick="checkAnswer()">ตรวจคำตอบ ✓</button>`;
+    }
+    
+    let dotsHTML = '<div class="dot-nav">';
+    for (let i = 0; i < total; i++) {
+      let dClass = 'dot';
+      if (i === curr) dClass += ' active';
+      else if (state.checked[i]) {
+        dClass += (state.answers[i] === state.questions[i].correctAnswer) ? ' ok' : ' no';
+      }
+      dotsHTML += `<button class="${dClass}" onclick="jumpTo(${i})">${i+1}</button>`;
+    }
+    dotsHTML += '</div>';
+
+    app.innerHTML = `
+      <div class="card" style="padding: 16px 20px;">
+        <div class="prog-text">
+          <span>ข้อที่ ${curr + 1} จาก ${total}</span>
+          <span>ตอบแล้ว ${state.answers.filter(a => a !== null).length} ข้อ</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width: ${pct}%"></div></div>
+      </div>
+      
+      <div class="card">
+        <div class="q-badge">${q.cat}</div>
+        <div class="q-text"><span class="q-num-circle">${curr + 1}</span> ${q.q}</div>
+        <div class="choices">${choicesHTML}</div>
+        ${fbHTML}
+        <div class="nav-buttons">${btnPrev}${btnNext}</div>
+      </div>
+      ${dotsHTML}
+    `;
+  }
+  else if (state.screen === 'result') {
+    let total = state.questions.length;
+    let score = 0;
+    
+    // คำนวณสถิติเพื่อใช้วิเคราะห์จุดอ่อน
+    let categoryStats = {};
+    
+    for (let i = 0; i < total; i++) {
+      let q = state.questions[i];
+      if (!categoryStats[q.cat]) categoryStats[q.cat] = { t: 0, c: 0 };
+      categoryStats[q.cat].t++;
+      
+      if (state.answers[i] === q.correctAnswer) {
+        score++;
+        categoryStats[q.cat].c++;
+      }
+    }
+    
+    let pct = Math.round((score / total) * 100);
+    
+    // หาจุดอ่อนจาก categoryStats
+    let weak = [];
+    for (let cat in categoryStats) {
+      if (categoryStats[cat].t > 0 && (categoryStats[cat].c / categoryStats[cat].t) <= 0.5) {
+        weak.push(cat);
+      }
+    }
+    
+    let fbMsg = weak.length > 0 
+      ? `📉 <strong>ระบบวิเคราะห์จุดอ่อน:</strong> คุณมีข้อผิดพลาดบ่อยในสาระ <strong>${weak.join(' และ ')}</strong> แนะนำให้กลับไปทบทวนเนื้อหาส่วนนี้เพิ่มเติมครับ`
+      : `✨ <strong>ระบบวิเคราะห์:</strong> ยอดเยี่ยมมาก! คุณทำคะแนนผ่านเกณฑ์ในทุกสาระการเรียนรู้ ไม่มีจุดอ่อนที่น่ากังวลครับ`;
+    
+    let today = new Date();
+    let dateString = today.getDate() + '/' + (today.getMonth()+1) + '/' + (today.getFullYear()+543);
+
+    let reviewHTML = '<div class="card" style="margin-top:20px"><div class="review-title" style="font-size: 16px;">📋 ตรวจสอบคำตอบอย่างละเอียด</div>';
+    for (let i = 0; i < total; i++) {
+      let q = state.questions[i];
+      let isCorr = (state.answers[i] === q.correctAnswer);
+      let userText = state.answers[i] !== null ? q.choices[state.answers[i]] : '(ไม่ได้ตอบ)';
+      let icon = isCorr ? '✓' : '✗';
+      let iconCls = isCorr ? 'ri-ok' : 'ri-no';
+      
+      reviewHTML += `
+        <div class="review-item">
+          <div class="r-q"><span class="ri-tick ${iconCls}" style="display:inline-flex">${icon}</span> ข้อ ${i+1}: ${q.q}</div>
+          <div class="r-a" style="color:var(--text-muted)">คุณตอบ: ${userText}</div>
+          <div class="r-a" style="color:var(--green); font-weight:600;">เฉลย: ${q.choices[q.correctAnswer]}</div>
+        </div>
+      `;
+    }
+    reviewHTML += '</div>';
+
+    app.innerHTML = `
+      <div class="card" style="text-align:center; padding:32px 20px;">
+        <h3 style="color:var(--primary); margin-bottom:10px;">รายงานผลการทดสอบภาษาไทย</h3>
+        <div style="font-size:20px; font-weight:700; margin-bottom:5px;">คุณ ${state.studentName}</div>
+        <div style="font-size:14px; color:var(--text-muted); margin-bottom:20px;">สังกัด: ${state.studentId} | วันที่สอบ: ${dateString}</div>
+        
+        <div style="font-size:60px; margin: 10px 0;">${pct >= 50 ? '🏆' : '📖'}</div>
+        <div style="font-size:56px; font-weight:700; color:var(--primary); line-height:1;">${score}</div>
+        <div style="font-size:16px; color:var(--text-muted); margin-bottom:20px;">จาก ${total} ข้อ (${pct}%)</div>
+        
+        <div class="feedback-box">${fbMsg}</div>
+        
+        <div class="grid-stats">
+          <div class="stat-box"><div class="stat-num" style="color:var(--green)">${score}</div><div style="font-size:12px;color:var(--text-muted)">ตอบถูก</div></div>
+          <div class="stat-box"><div class="stat-num" style="color:var(--red)">${total - score}</div><div style="font-size:12px;color:var(--text-muted)">ตอบผิด</div></div>
+          <div class="stat-box"><div class="stat-num" style="color:var(--primary)">${pct}%</div><div style="font-size:12px;color:var(--text-muted)">คะแนน</div></div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="location.reload()">🔄 สุ่มข้อสอบทำใหม่อีกครั้ง</button>
+      </div>
+      ${reviewHTML}
+    `;
+  }
+}
+
+// ควบคุมการทำงานของปุ่ม
+function selectAnswer(index) {
+  if (state.checked[state.current]) return;
+  state.answers[state.current] = index;
+  renderApp();
+}
+
+function checkAnswer() {
+  if (state.answers[state.current] === null) return;
+  state.checked[state.current] = true;
+  renderApp();
+}
+
+function goNext() {
+  if (state.current < state.questions.length - 1) {
+    state.current++;
+    renderApp();
+  }
+}
+
+function goPrev() {
+  if (state.current > 0) {
+    state.current--;
+    renderApp();
+  }
+}
+
+function jumpTo(index) {
+  state.current = index;
+  renderApp();
+}
+
+function showResult() {
+  state.screen = 'result';
+  renderApp();
+}
+
+// โหลดหน้าแรก
+renderApp();
+</script>
+</body>
+</html>
+  .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+  .nav-buttons .btn-primary { width: 48%; }
+
+  .prog-text { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .prog-bar { background: #eee; height: 10px; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .prog-fill { background: var(--primary); height: 100%; width: 0%; transition: 0.3s; }
+
+  .q-badge { font-size: 12px; color: var(--primary); font-weight: 700; margin-bottom: 12px; }
+  .q-text { font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
+
   /* กล่องตัวเลือกที่ยืดหยุ่น */
   .choices { 
     display: flex; 
